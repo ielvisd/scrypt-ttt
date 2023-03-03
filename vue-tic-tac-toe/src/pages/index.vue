@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// import { TicTacToe } from '../contracts/tictagit comctoe.ts'
 defineOptions({
   name: 'IndexPage',
 })
