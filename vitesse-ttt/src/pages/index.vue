@@ -1,6 +1,5 @@
 <!-- eslint-disable no-console -->
 <script setup>
-import '../App.css'
 import { ref } from 'vue'
 
 const initialGameData = {

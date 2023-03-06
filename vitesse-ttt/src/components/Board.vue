@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
 // import Square from './Square.vue'
 import { defineProps, onBeforeMount } from 'vue'
+import type { SquareData } from '../types'
 
 const props = defineProps({
   squares: {
@@ -17,9 +18,13 @@ const props = defineProps({
   },
 })
 
-let board = []
+const emit = defineEmits<{
+  (e: 'squareClick', square: SquareData): void
+}>()
 
-function createBoard(row, col) {
+let board: { index: number; value: unknown }[][] = []
+
+function createBoard(row: number, col: number) {
   const newBoard = []
   let cellCounter = 0
 
@@ -35,7 +40,7 @@ function createBoard(row, col) {
   return newBoard
 }
 
-function getWinnerClass(index) {
+function getWinnerClass(index: unknown) {
   return props.winnerSquares
     && (props.winnerSquares[0] === index
       || props.winnerSquares[1] === index
@@ -52,13 +57,16 @@ onBeforeMount(() => {
 <template>
   <div>
     <div v-for="(columns, i) in board" :key="i" class="board-row">
-      <!-- <Square
+      <Square
         v-for="(square, j) in columns"
         :key="j"
         :winner-class="getWinnerClass(square.index)"
-        :value="square.value"
-        @click="onClick(square.index)"
-      /> -->
+        :value="square"
+        @square-click="
+          (square: any) => {
+            emit('squareClick', square)
+          }"
+      />
     </div>
   </div>
 </template>

@@ -1,3 +1,4 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
 import { computed, defineProps, ref } from 'vue'
 import type { GameData, SquareData } from '../types'
@@ -51,6 +52,7 @@ const canMove = (i: number, squares: SquareData[]) => {
 }
 
 const handleClick = (i: number) => {
+  console.log('in handleClick, i: ', i)
   const current = history.value[currentStepNumber.value]
   const squares = current.squares.slice()
 
@@ -116,7 +118,7 @@ const end = computed(() => {
         </div>
       </div>
 
-      <Board :squares="current.squares" :winner-squares="winnerRow" @click="handleClick" />
+      <Board :squares="current.squares" :winner-squares="winnerRow" @square-click="handleClick" @click="handleClick" />
 
       <div class="game-bottom">
         {{ end }}
