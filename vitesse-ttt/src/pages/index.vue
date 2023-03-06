@@ -40,7 +40,7 @@ const setGameData = newGameData => (gameData.value = newGameData)
         :on-cancel="cancelGame"
         :started="gameData.start"
       />
-      <!-- <Game :game-data="gameData" :set-game-data="setGameData" /> -->
+      <Game :game-data="gameData" :set-game-data="setGameData" />
     </header>
   </div>
 </template>
