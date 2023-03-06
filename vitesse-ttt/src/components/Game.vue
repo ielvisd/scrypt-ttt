@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, defineProps, ref } from 'vue'
 import type { GameData, SquareData } from '../types'
-// import Board from './Board.vue'
 
 const props = defineProps({
   gameData: {
@@ -107,17 +106,17 @@ const end = computed(() => {
     <div class="game-board">
       <div class="game-title">
         <div v-if="!isAliceTurn" class="bob">
-          Bob <img src="/tic-tac-toe/bob.png" alt="">
+          Bob <img src="../../assets/bob.png" alt="">
         </div>
         <div v-else class="alice">
-          Alice <img src="/tic-tac-toe/alice.jpg" alt="">
+          Alice <img src="../../assets/alice.jpg" alt="">
         </div>
         <div class="game-status">
           {{ status }}
         </div>
       </div>
 
-      <!-- <Board :squares="current.squares" :winner-squares="winnerRow" @click="handleClick" /> -->
+      <Board :squares="current.squares" :winner-squares="winnerRow" @click="handleClick" />
 
       <div class="game-bottom">
         {{ end }}
