@@ -79,6 +79,9 @@ const handleClick = (i: number) => {
     start: true,
   }
 
+  console.log('gameData_: ', gameData_)
+
+  // Let's emit here instead and let the parent handle the update
   props.setGameData(gameData_)
 }
 
