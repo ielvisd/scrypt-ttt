@@ -24,20 +24,12 @@ const startGame = async (amount) => {
 }
 
 const cancelGame = async () => {
-  console.log('cancelGame, gameData.value: ', gameData.value)
   // Reset the gameData to the initial value.
   gameData.value = structuredClone(initialGameData)
 }
 
 const setGameData = (newGameData) => {
-  console.log('setGameData, newGameData: ', newGameData)
   gameData.value = newGameData
-
-  console.log('setGameData, gameData.value: ', gameData.value)
-  console.log('setGameData, gameData.value.history: ', gameData.value.history[1])
-  // The newGameData contains a history array. This needs to be cloned.
-  // Otherwise, the history array will be the same as the old one.
-  // Object.assign(gameData.value, newGameData)
 }
 </script>
 

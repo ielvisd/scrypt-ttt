@@ -274,7 +274,6 @@ a {
 }
 
 .bob {
-  padding-top: 1em;
   text-align: center;
   line-height: 50px;
 }
@@ -285,7 +284,6 @@ a {
 }
 
 .alice {
-  padding-top: 1em;
   text-align: center;
   line-height: 50px;
 }

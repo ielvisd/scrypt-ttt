@@ -17,13 +17,8 @@ const emit = defineEmits<{
 const isAliceTurn = ref(props.gameData.isAliceTurn)
 const currentStepNumber = ref(props.gameData.currentStepNumber)
 const history = ref(props.gameData.history)
-
-// gameData can change from the parent component. Add a watcher to the gameData prop that will update the local state when the gameData prop changes.
-watch(() => props.gameData, (newGameData) => {
-  isAliceTurn.value = newGameData.isAliceTurn
-  currentStepNumber.value = newGameData.currentStepNumber
-  history.value = newGameData.history
-})
+const winner = ref(null)
+const winnerRow = ref(null)
 
 const calculateWinner = (squares: SquareData[]) => {
   const lines = [
@@ -39,12 +34,25 @@ const calculateWinner = (squares: SquareData[]) => {
 
   for (let i = 0; i < lines.length; i += 1) {
     const [a, b, c] = lines[i]
-    if (squares[a] && squares[b] && squares[c] && squares[a].label === squares[b].label && squares[a].label === squares[c].label)
-      return { winner: squares[a], winnerRow: lines[i] }
+    if (squares[a] && squares[b] && squares[c] && squares[a].label === squares[b].label && squares[a].label === squares[c].label) {
+      console.log('hello?sdlfkasdofa')
+      winner.value = squares[a]
+      winnerRow.value = lines[i]
+      return
+    }
   }
 
-  return { winner: null, winnerRow: null }
+  winner.value = null
+  winnerRow.value = null
 }
+
+// gameData can change from the parent component. Add a watcher to the gameData prop that will update the local state when the gameData prop changes.
+watch(() => props.gameData, (newGameData) => {
+  isAliceTurn.value = newGameData.isAliceTurn
+  currentStepNumber.value = newGameData.currentStepNumber
+  history.value = newGameData.history
+  calculateWinner(history.value[currentStepNumber.value].squares)
+})
 
 const canMove = (i: { index: number; value: string }, squares: SquareData[]) => {
   if (!props.gameData.start) {
@@ -52,7 +60,7 @@ const canMove = (i: { index: number; value: string }, squares: SquareData[]) => 
     return
   }
 
-  if (calculateWinner(squares).winner || squares[i.index])
+  if (winner.value || squares[i.index])
     return false
 
   return true
@@ -60,7 +68,6 @@ const canMove = (i: { index: number; value: string }, squares: SquareData[]) => 
 
 // i is an Object. It is the index and value of the square.
 const handleClick = (i: { index: number; value: string }) => {
-  console.log('in handleClick, i: ', i)
   const current = history.value[currentStepNumber.value]
   const squares = current.squares.slice()
 
@@ -74,13 +81,11 @@ const handleClick = (i: { index: number; value: string }) => {
     n: history.value.length,
   }
 
-  const winner = calculateWinner(squares).winner
-
   const gameData_ = {
     history: history.value.concat([{
       squares,
     }]),
-    isAliceTurn: winner ? isAliceTurn.value : !isAliceTurn.value,
+    isAliceTurn: winner.value ? isAliceTurn.value : !isAliceTurn.value,
     currentStepNumber: history.value.length,
     start: true,
   }
@@ -91,23 +96,24 @@ const handleClick = (i: { index: number; value: string }) => {
   history.value = gameData_.history
 
   emit('gameDataChange', gameData_)
+  calculateWinner(squares)
 }
 
 const current = computed(() => history.value[currentStepNumber.value])
-const { winner, winnerRow } = calculateWinner(current.value.squares)
 
 const status = computed(() => {
-  if (winner)
-    return `Winner: ${winner.label}`
+  if (winner.value)
+    // If there is a winner, show the winner which is the opposite of the current player.
+    return `Winner: ${isAliceTurn.value ? 'Bob' : 'Alice'} - ${winner.value.label}`
 
   return `Next player: ${isAliceTurn.value ? 'Alice' : 'Bob'}`
 })
 
 const end = computed(() => {
-  if (winner)
-    return `Winner: ${winner.label}`
+  if (winner.value)
+    return `Winner: ${winner.value.label}`
 
-  if (current.value.squares.every(square => square))
+  if (current.value.squares.every((square: any) => square))
     return 'Draw!'
 
   return ''
@@ -118,18 +124,26 @@ const end = computed(() => {
   <div class="game">
     <div class="game-board">
       <div class="game-title">
-        <div v-if="!isAliceTurn" class="bob">
+        <div v-if="!isAliceTurn && !winner" class="bob">
           Bob <img src="../../assets/bob.png" alt="">
         </div>
-        <div v-else class="alice">
+        <div v-else-if="!winner" class="alice">
           Alice <img src="../../assets/alice.jpg" alt="">
         </div>
-        <div class="game-status">
-          {{ status }}
+        <div class="game-status flex justify-center items-center">
+          <p>
+            {{ status }}
+          </p>
+          <div v-if="isAliceTurn && winner" class="bob ml-4">
+            <img src="../../assets/bob.png" alt="">
+          </div>
+          <div v-else-if="winner" class="alice ml-4">
+            <img src="../../assets/alice.jpg" alt="">
+          </div>
         </div>
       </div>
 
-      <Board :squares="current.squares" :winner-squares="winnerRow" @square-click="handleClick" />
+      <Board mt-4 :squares="current.squares" :winner-squares="winnerRow" @square-click="handleClick" />
 
       <div class="game-bottom">
         {{ end }}
