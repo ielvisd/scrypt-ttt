@@ -1,6 +1,6 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
-import { computed, defineProps, ref } from 'vue'
+import { computed, defineEmits, defineProps, ref } from 'vue'
 import type { GameData, SquareData } from '../types'
 
 const props = defineProps({
@@ -8,11 +8,11 @@ const props = defineProps({
     type: Object as () => GameData,
     required: true,
   },
-  setGameData: {
-    type: Function as () => (data: GameData) => void,
-    required: true,
-  },
 })
+
+const emit = defineEmits<{
+  (e: 'gameDataChange', data: GameData): void
+}>()
 
 const calculateWinner = (squares: SquareData[]) => {
   const lines = [
@@ -39,7 +39,7 @@ const isAliceTurn = ref(props.gameData.isAliceTurn)
 const currentStepNumber = ref(props.gameData.currentStepNumber)
 const history = ref(props.gameData.history)
 
-const canMove = (i: number, squares: SquareData[]) => {
+const canMove = (i: Object, squares: SquareData[]) => {
   if (!props.gameData.start) {
     alert('Please start the game!')
     return
@@ -51,7 +51,8 @@ const canMove = (i: number, squares: SquareData[]) => {
   return true
 }
 
-const handleClick = (i: number) => {
+// i is an Object. It is the index and value of the square.
+const handleClick = (i: { index: number; value: string }) => {
   console.log('in handleClick, i: ', i)
   const current = history.value[currentStepNumber.value]
   const squares = current.squares.slice()
@@ -61,19 +62,19 @@ const handleClick = (i: number) => {
     return
   }
 
-  squares[i] = {
+  squares[i.index] = {
     label: isAliceTurn.value ? 'X' : 'O',
     n: history.value.length,
   }
 
+  console.log('squares: ', squares, i, squares[i])
+
   const winner = calculateWinner(squares).winner
 
   const gameData_ = {
-    history: history.value.concat([
-      {
-        squares,
-      },
-    ]),
+    history: history.value.concat([{
+      squares,
+    }]),
     isAliceTurn: winner ? isAliceTurn.value : !isAliceTurn.value,
     currentStepNumber: history.value.length,
     start: true,
@@ -81,8 +82,16 @@ const handleClick = (i: number) => {
 
   console.log('gameData_: ', gameData_)
 
-  // Let's emit here instead and let the parent handle the update
-  props.setGameData(gameData_)
+  console.log('gameData_history, gameData_.history: ', gameData_.history)
+
+  // Handle local updates and emit game state
+  isAliceTurn.value = gameData_.isAliceTurn
+  currentStepNumber.value = gameData_.currentStepNumber
+  history.value = gameData_.history
+
+  console.log('history.value: ', history.value)
+
+  emit('gameDataChange', gameData_)
 }
 
 const current = computed(() => history.value[currentStepNumber.value])
@@ -121,7 +130,7 @@ const end = computed(() => {
         </div>
       </div>
 
-      <Board :squares="current.squares" :winner-squares="winnerRow" @square-click="handleClick" @click="handleClick" />
+      <Board :squares="current.squares" :winner-squares="winnerRow" @square-click="handleClick" />
 
       <div class="game-bottom">
         {{ end }}

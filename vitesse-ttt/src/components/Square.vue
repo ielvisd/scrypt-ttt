@@ -11,10 +11,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  onClick: {
-    type: Function,
-    required: true,
-  },
 })
 
 const emit = defineEmits<{
@@ -32,7 +28,7 @@ const tx = squareData?.tx ? `https://test.whatsonchain.com/tx/${squareData.tx}` 
       class="square" :class="[winnerClass]"
       @click="emit('squareClick', squareData)"
     >
-      <a v-if="squareData" :href="tx" target="_blank" title="Click to see the transaction" rel="noreferrer">{{ squareData.label }}</a>
+      <a v-if="squareData.value" :href="tx" target="_blank" title="Click to see the transaction" rel="noreferrer">{{ squareData.value.label }}</a>
     </button>
     <div v-if="squareData" class="squareicon">
       {{ squareData.n }}

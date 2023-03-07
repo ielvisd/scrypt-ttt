@@ -16,7 +16,7 @@ const initialGameData = {
   start: false,
 }
 
-const gameData = ref(initialGameData)
+const gameData = ref(structuredClone(initialGameData))
 
 const startGame = async (amount) => {
   gameData.value.amount = amount
@@ -27,7 +27,16 @@ const cancelGame = async () => {
   Object.assign(gameData.value, initialGameData)
 }
 
-const setGameData = newGameData => (gameData.value = newGameData)
+const setGameData = (newGameData) => {
+  console.log('setGameData, newGameData: ', newGameData)
+  gameData.value = newGameData
+
+  console.log('setGameData, gameData.value: ', gameData.value)
+  console.log('setGameData, gameData.value.history: ', gameData.value.history[1])
+  // The newGameData contains a history array. This needs to be cloned.
+  // Otherwise, the history array will be the same as the old one.
+  // Object.assign(gameData.value, newGameData)
+}
 </script>
 
 <template>
@@ -39,7 +48,10 @@ const setGameData = newGameData => (gameData.value = newGameData)
         :on-cancel="cancelGame"
         :started="gameData.start"
       />
-      <Game :game-data="gameData" :set-game-data="setGameData" />
+      <Game
+        :game-data="gameData"
+        @game-data-change="setGameData"
+      />
     </header>
   </div>
 </template>

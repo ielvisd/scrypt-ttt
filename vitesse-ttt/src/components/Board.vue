@@ -1,6 +1,7 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
 // import Square from './Square.vue'
-import { defineProps, onBeforeMount } from 'vue'
+import { defineProps, onBeforeMount, ref, watch } from 'vue'
 import type { SquareData } from '../types'
 
 const props = defineProps({
@@ -12,17 +13,26 @@ const props = defineProps({
     type: Array,
     default: null,
   },
-  onClick: {
-    type: Function,
-    required: true,
-  },
 })
 
 const emit = defineEmits<{
   (e: 'squareClick', square: SquareData): void
 }>()
 
-let board: { index: number; value: unknown }[][] = []
+// Create a board array that will be used to render the squares. This board should be reactive.
+const board: { index: number; value: unknown }[][] = ref([])
+
+// Add a watcher to the squares prop that will update the board when the squares prop changes. The new board will be created from the new squares.
+watch(() => props.squares, (newSquares) => {
+  console.log('in watch, newSquares: ', newSquares)
+  console.log('board is: ', board.value)
+  // Loop through the board and update the value of each square.
+  board.value.forEach((columns: any[], i: number) => {
+    columns.forEach((square: { value: unknown }, j: number) => {
+      square.value = newSquares[i * 3 + j]
+    })
+  })
+})
 
 function createBoard(row: number, col: number) {
   const newBoard = []
@@ -50,7 +60,7 @@ function getWinnerClass(index: unknown) {
 }
 
 onBeforeMount(() => {
-  board = createBoard(3, 3)
+  board.value = createBoard(3, 3)
 })
 </script>
 
@@ -59,7 +69,7 @@ onBeforeMount(() => {
     <div v-for="(columns, i) in board" :key="i" class="board-row">
       <Square
         v-for="(square, j) in columns"
-        :key="j"
+        :key="(i * 3) + j"
         :winner-class="getWinnerClass(square.index)"
         :value="square"
         @square-click="
