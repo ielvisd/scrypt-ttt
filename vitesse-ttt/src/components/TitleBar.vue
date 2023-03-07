@@ -1,11 +1,14 @@
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { defineEmits, ref } from 'vue'
 
 const props = defineProps({
   onStart: Function,
-  onCancel: Function,
   started: Boolean,
 })
+
+const emit = defineEmits<{
+  (e: 'cancel'): void
+}>()
 
 const amountRef = ref(null)
 
@@ -31,15 +34,21 @@ const onCancel = () => {
   <div>
     <template v-if="props.started">
       The game is in progress ...
-      <button class="pure-button cancel" @click="onCancel">
+      <button
+        class="pure-button cancel" amountRef placeholder="in satoshis" @click="$emit('cancel')"
+      >
         Restart
       </button>
     </template>
     <template v-else>
       <label>Bet amount:
-        <input ref="amountRef" type="number" name="amount" min="1" :defaultValue="50000" placeholder="in satoshis">
+        <input
+          ref="amountRef" type="number" name="amount" min="1" :defaultValue="50000" placeholder="in satoshis"
+        >
       </label>
-      <button class="start" @click="onStart">
+      <button
+        class="pure-button start" @click="onStart"
+      >
         Start
       </button>
     </template>

@@ -1,6 +1,6 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, ref } from 'vue'
+import { computed, defineEmits, defineProps, ref, watch } from 'vue'
 import type { GameData, SquareData } from '../types'
 
 const props = defineProps({
@@ -13,6 +13,17 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'gameDataChange', data: GameData): void
 }>()
+
+const isAliceTurn = ref(props.gameData.isAliceTurn)
+const currentStepNumber = ref(props.gameData.currentStepNumber)
+const history = ref(props.gameData.history)
+
+// gameData can change from the parent component. Add a watcher to the gameData prop that will update the local state when the gameData prop changes.
+watch(() => props.gameData, (newGameData) => {
+  isAliceTurn.value = newGameData.isAliceTurn
+  currentStepNumber.value = newGameData.currentStepNumber
+  history.value = newGameData.history
+})
 
 const calculateWinner = (squares: SquareData[]) => {
   const lines = [
@@ -34,10 +45,6 @@ const calculateWinner = (squares: SquareData[]) => {
 
   return { winner: null, winnerRow: null }
 }
-
-const isAliceTurn = ref(props.gameData.isAliceTurn)
-const currentStepNumber = ref(props.gameData.currentStepNumber)
-const history = ref(props.gameData.history)
 
 const canMove = (i: { index: number; value: string }, squares: SquareData[]) => {
   if (!props.gameData.start) {
@@ -67,8 +74,6 @@ const handleClick = (i: { index: number; value: string }) => {
     n: history.value.length,
   }
 
-  console.log('squares: ', squares, i, squares[i])
-
   const winner = calculateWinner(squares).winner
 
   const gameData_ = {
@@ -80,16 +85,10 @@ const handleClick = (i: { index: number; value: string }) => {
     start: true,
   }
 
-  console.log('gameData_: ', gameData_)
-
-  console.log('gameData_history, gameData_.history: ', gameData_.history)
-
   // Handle local updates and emit game state
   isAliceTurn.value = gameData_.isAliceTurn
   currentStepNumber.value = gameData_.currentStepNumber
   history.value = gameData_.history
-
-  console.log('history.value: ', history.value)
 
   emit('gameDataChange', gameData_)
 }

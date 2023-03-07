@@ -24,7 +24,9 @@ const startGame = async (amount) => {
 }
 
 const cancelGame = async () => {
-  Object.assign(gameData.value, initialGameData)
+  console.log('cancelGame, gameData.value: ', gameData.value)
+  // Reset the gameData to the initial value.
+  gameData.value = structuredClone(initialGameData)
 }
 
 const setGameData = (newGameData) => {
@@ -45,8 +47,8 @@ const setGameData = (newGameData) => {
       <h2>Play Tic-Tac-Toe on Bitcoin</h2>
       <TitleBar
         :on-start="startGame"
-        :on-cancel="cancelGame"
         :started="gameData.start"
+        @cancel="cancelGame"
       />
       <Game
         :game-data="gameData"
