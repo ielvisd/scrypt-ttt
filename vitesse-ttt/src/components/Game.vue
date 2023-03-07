@@ -39,13 +39,13 @@ const isAliceTurn = ref(props.gameData.isAliceTurn)
 const currentStepNumber = ref(props.gameData.currentStepNumber)
 const history = ref(props.gameData.history)
 
-const canMove = (i: Object, squares: SquareData[]) => {
+const canMove = (i: { index: number; value: string }, squares: SquareData[]) => {
   if (!props.gameData.start) {
     alert('Please start the game!')
     return
   }
 
-  if (calculateWinner(squares).winner || squares[i])
+  if (calculateWinner(squares).winner || squares[i.index])
     return false
 
   return true
